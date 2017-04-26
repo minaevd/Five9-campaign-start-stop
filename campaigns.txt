@@ -1,0 +1,2 @@
+# Put campaign names here which you'd like to start or stop
+# One campaign name per line with no quotes or anything
