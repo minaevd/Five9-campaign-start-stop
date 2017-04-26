@@ -60,7 +60,7 @@ sub main {
 	my $client = initialize_SOAP();
 
 	# get all the campaigns to start/stop
-	my $campaigns = get_campaigns();
+	my $campaigns = get_campaigns($client);
 
 	# do the job
 	foreach my $camp (@{$campaigns}) {
@@ -227,6 +227,8 @@ sub stop {
 
 sub get_campaigns {
 
+	my $client = shift();
+
 	my @ret;
 
 	my $filepath = Cwd::getcwd()."/campaigns.txt";
@@ -240,6 +242,17 @@ sub get_campaigns {
 		s/\s+$//;               # no trailing white
 		next unless length;     # anything left?
 		push @ret, $_;
+	}
+
+	# get all existing campaigns if nothing found in campaigns.txt file
+	if(scalar(@ret) == 0) {
+		my @camps = $client->getCampaigns(
+			$client,
+			SOAP::Data->name('campaignNamePattern', '.*')
+#			SOAP::Data->name('campaignType', '.*')
+		);
+
+		push @ret, $_->{'name'} for @camps;
 	}
 
 	return \@ret;
